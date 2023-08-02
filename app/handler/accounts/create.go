@@ -30,8 +30,24 @@ func (h *handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	panic("Must Implement Account Registration")
+	//panic("Must Implement Account Registration")
 
+	ctx := r.Context()
+
+	//同じユーザネームが重複して登録されようとしたら弾く
+	if entity, err := h.ar.FindByUsername(ctx, account.Username); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if entity != nil {
+		http.Error(w, "Username already exists", http.StatusBadRequest)
+		return
+	}
+
+	//ユーザ作成する
+	if err := h.ar.CreateUser(ctx, account); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(account); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
