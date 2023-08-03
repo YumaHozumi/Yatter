@@ -6,5 +6,6 @@ import (
 )
 
 type Status interface {
-	AddStatus(ctx context.Context, status *object.Status) error
+	CreateStatus(ctx context.Context, status *object.Status, account *object.Account) (int64, error)
+	FindStatusByID(ctx context.Context, id int64) (*object.Status, error)
 }

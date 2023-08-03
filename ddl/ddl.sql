@@ -14,6 +14,7 @@ CREATE TABLE `status` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `account_id` bigint(20) NOT NULL,
   `content` text,
+  `url` varchar(255),
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`account_id`) REFERENCES account(`id`),
   PRIMARY KEY (`id`)

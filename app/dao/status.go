@@ -2,6 +2,9 @@ package dao
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"fmt"
 	"yatter-backend-go/app/domain/object"
 	"yatter-backend-go/app/domain/repository"
 
@@ -19,7 +22,7 @@ func NewStatus(db *sqlx.DB) repository.Status {
 }
 
 // ステータスを追加
-func (r *status) AddStatus(ctx context.Context, status *object.Status) error {
+func (r *status) CreateStatus(ctx context.Context, status *object.Status, account *object.Account) (int64, error) {
 	//トランザクションの開始
 	tx, _ := r.db.Begin()
 	var err error
@@ -33,14 +36,35 @@ func (r *status) AddStatus(ctx context.Context, status *object.Status) error {
 		}
 	}()
 
-	panic("stop")
+	res, err := tx.Exec(`INSERT INTO status (account_id, content) VALUES (?, ?)`, account.ID, status.Content)
 
-	if _, err = tx.Exec(`INSERT INTO account (id, username, password_hash) VALUES (?, ?, ?)`, account.ID, account.Username, account.PasswordHash); err != nil {
-		return err
+	if err != nil {
+		return 0, err
 	}
 
 	if err = tx.Commit(); err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}
+
+func (r *status) FindStatusByID(ctx context.Context, id int64) (*object.Status, error) {
+	entity := new(object.Status)
+
+	err := r.db.QueryRowxContext(ctx, "select * from status where id = ?", id).StructScan(entity)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to find status from db: %w", err)
+	}
+
+	return entity, nil
 }

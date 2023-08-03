@@ -42,6 +42,7 @@ func (r *account) FindByUsername(ctx context.Context, username string) (*object.
 func (r *account) CreateUser(ctx context.Context, account *object.Account) error {
 	//トランザクションの開始
 	tx, _ := r.db.Begin()
+
 	var err error
 	defer func() {
 		switch r := recover(); {
@@ -53,7 +54,7 @@ func (r *account) CreateUser(ctx context.Context, account *object.Account) error
 		}
 	}()
 
-	if _, err = tx.Exec(`INSERT INTO account (id, username, password_hash) VALUES (?, ?, ?)`, account.ID, account.Username, account.PasswordHash); err != nil {
+	if _, err = tx.Exec(`INSERT INTO account (username, password_hash) VALUES (?, ?)`, account.Username, account.PasswordHash); err != nil {
 		return err
 	}
 

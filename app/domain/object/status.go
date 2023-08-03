@@ -8,12 +8,11 @@ type Status struct {
 
 	AccountID int64 `json:"account_id" db:"account_id"`
 
-	// The username of the account
-	Username string `json:"username,omitempty"`
-
 	// The content of the status
 	Content string `json:"content,omitempty"`
 
+	URL *string `json:"url,omitempty" db:"url"`
+
 	// The time the account was created
-	CreateAt time.Time `json:"create_at,omitempty" db:"create_at"`
+	CreateAt time.Time `json:"create_at,omitempty" db:"created_at"`
 }
