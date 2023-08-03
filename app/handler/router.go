@@ -6,7 +6,6 @@ import (
 
 	"yatter-backend-go/app/domain/repository"
 	"yatter-backend-go/app/handler/accounts"
-	"yatter-backend-go/app/handler/auth"
 	"yatter-backend-go/app/handler/health"
 	"yatter-backend-go/app/handler/statuses"
 
@@ -32,7 +31,7 @@ func NewRouter(ar repository.Account, sr repository.Status) http.Handler {
 
 	r.Mount("/v1/accounts", accounts.NewRouter(ar))
 	//statusesには認証済みのアカウントしかアクセスできない
-	r.Mount("/v1/statuses", auth.Middleware(ar)(statuses.NewRouter(sr)))
+	r.Mount("/v1/statuses", statuses.NewRouter(sr, ar))
 	r.Mount("/v1/health", health.NewRouter())
 
 	return r

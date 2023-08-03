@@ -21,11 +21,30 @@ func (h *handler) Find(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
+	} else if entity == nil {
+		http.Error(w, "Status not found", http.StatusBadRequest)
+		return
 	}
+
+	//statusのアカウントIDからアカウント取得
+	account, err := h.ar.FindByUserID(ctx, entity.AccountID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	} else if entity == nil {
+		http.Error(w, "User not found", http.StatusBadRequest)
+		return
+	}
+
+	var res Response
+	res.Id = entity.ID
+	res.Account = *account
+	res.Content = entity.Content
+	res.Created_at = entity.CreateAt
 
 	//取得したentity返す
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(entity); err != nil {
+	if err := json.NewEncoder(w).Encode(res); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

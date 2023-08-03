@@ -39,6 +39,22 @@ func (r *account) FindByUsername(ctx context.Context, username string) (*object.
 	return entity, nil
 }
 
+// idでユーザを検索
+func (r *account) FindByUserID(ctx context.Context, id int64) (*object.Account, error) {
+	entity := new(object.Account)
+
+	err := r.db.QueryRowxContext(ctx, "select * from account where id = ?", id).StructScan(entity)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("failed to find account from db: %w", err)
+	}
+
+	return entity, nil
+}
+
 func (r *account) CreateUser(ctx context.Context, account *object.Account) error {
 	//トランザクションの開始
 	tx, _ := r.db.Begin()
