@@ -1,22 +1,25 @@
-package accounts
+package statuses
 
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
 
 func (h *handler) Find(w http.ResponseWriter, r *http.Request) {
-	username := chi.URLParam(r, "username")
-
-	//ユーザ検索
-	entity, err := h.ar.FindByUsername(r.Context(), username)
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	} else if entity == nil {
-		http.Error(w, "User not found", http.StatusBadRequest)
+	}
+
+	ctx := r.Context()
+	entity, err := h.sr.FindStatusByID(ctx, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
