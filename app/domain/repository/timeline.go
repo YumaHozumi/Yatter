@@ -6,5 +6,5 @@ import (
 )
 
 type Timeline interface {
-	GetPublic(ctx context.Context) (*object.Timeline, error)
+	GetPublic(ctx context.Context, limit int, maxID int64, sinceID int64) (*object.Timeline, error)
 }

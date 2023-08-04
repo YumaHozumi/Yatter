@@ -21,7 +21,7 @@ func NewTimeline(db *sqlx.DB) repository.Timeline {
 	return &timeline{db: db}
 }
 
-func (r *timeline) GetPublic(ctx context.Context) (*object.Timeline, error) {
+func (r *timeline) GetPublic(ctx context.Context, limit int, maxID int64, sinceID int64) (*object.Timeline, error) {
 	entity := new(object.Timeline)
 	//status一覧を取得するクエリ
 	query := `
@@ -36,7 +36,18 @@ func (r *timeline) GetPublic(ctx context.Context) (*object.Timeline, error) {
 			status
 		INNER JOIN 
 		account ON status.account_id = account.id
-	`
+		`
+	//maxID未満のアカウントのstatusだけ
+	if maxID > 0 {
+		query += fmt.Sprintf("WHERE account.id < %d ", maxID)
+	}
+	//sinceIDより大きいアカウントのstatusだけ
+	if sinceID > 0 {
+		query += fmt.Sprintf("WHERE account.id > %d ", sinceID)
+	}
+	//取得する件数を制限
+	query += fmt.Sprintf("LIMIT %d ", limit)
+
 	rows, err := r.db.QueryxContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -51,6 +62,7 @@ func (r *timeline) GetPublic(ctx context.Context) (*object.Timeline, error) {
 		return nil, fmt.Errorf("failed to get timeline from db: %w", err)
 	}
 
+	//statusをtimelineに追加
 	for rows.Next() {
 		status := new(object.Status)
 		if err := rows.StructScan(&status); err != nil {
