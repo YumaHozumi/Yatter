@@ -19,6 +19,7 @@ func NewRouter(sr repository.Status, ar repository.Account) http.Handler {
 	h := &handler{sr, ar}
 	//認証あり
 	r.With(auth.Middleware(ar)).Post("/", h.CreateStatus)
+	r.With(auth.Middleware(ar)).Delete("/{id}", h.Delete)
 	//認証なし
 	r.Get("/{id}", h.Find)
 

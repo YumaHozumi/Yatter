@@ -68,3 +68,23 @@ func (r *status) FindStatusByID(ctx context.Context, id int64) (*object.Status, 
 
 	return entity, nil
 }
+
+func (r *status) DeleteStatus(ctx context.Context, id int64) error {
+	query := "DELETE FROM status WHERE id = ?"
+
+	result, err := r.db.ExecContext(ctx, query, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete status: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get affected rows: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no status found with ID: %d", id)
+	}
+
+	return nil
+}
