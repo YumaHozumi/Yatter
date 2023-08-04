@@ -27,15 +27,15 @@ func (r *timeline) GetPublic(ctx context.Context) (*object.Timeline, error) {
 	query := `
 		SELECT 
 		status.id AS "id", 
-		accounts.id AS "account.id",
-		accounts.username AS "account.username",
-		accounts.create_at AS "account.created_at",
+		account.id AS "account.id",
+		account.username AS "account.username",
+		account.create_at AS "account.create_at",
 		status.content AS "content",
-		status.created_at AS "create_at"
+		status.created_at AS "created_at"
 		FROM 
 			status
 		INNER JOIN 
-		accounts ON status.account_id = accounts.id
+		account ON status.account_id = account.id
 	`
 	rows, err := r.db.QueryxContext(ctx, query)
 	if err != nil {
@@ -49,6 +49,17 @@ func (r *timeline) GetPublic(ctx context.Context) (*object.Timeline, error) {
 		}
 
 		return nil, fmt.Errorf("failed to get timeline from db: %w", err)
+	}
+
+	for rows.Next() {
+		status := new(object.Status)
+		if err := rows.StructScan(&status); err != nil {
+			return nil, err
+		}
+		entity.Statuses = append(entity.Statuses, *status)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return entity, nil
