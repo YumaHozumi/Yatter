@@ -18,4 +18,10 @@ CREATE TABLE `status` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`account_id`) REFERENCES account(`id`),
   PRIMARY KEY (`id`)
-)
+);
+
+CREATE TABLE `media` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `media_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);

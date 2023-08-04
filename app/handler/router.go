@@ -7,6 +7,7 @@ import (
 	"yatter-backend-go/app/domain/repository"
 	"yatter-backend-go/app/handler/accounts"
 	"yatter-backend-go/app/handler/health"
+	"yatter-backend-go/app/handler/media"
 	"yatter-backend-go/app/handler/statuses"
 	"yatter-backend-go/app/handler/timeline"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/go-chi/cors"
 )
 
-func NewRouter(ar repository.Account, sr repository.Status, tr repository.Timeline) http.Handler {
+func NewRouter(ar repository.Account, sr repository.Status, tr repository.Timeline, mr repository.Media) http.Handler {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -34,6 +35,7 @@ func NewRouter(ar repository.Account, sr repository.Status, tr repository.Timeli
 	r.Mount("/v1/statuses", statuses.NewRouter(sr, ar))
 	r.Mount("/v1/health", health.NewRouter())
 	r.Mount("/v1/timelines", timeline.NewRouter(tr))
+	r.Mount("/v1/media", media.NewRouter(mr))
 
 	return r
 }
