@@ -2,8 +2,6 @@ package dao
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"yatter-backend-go/app/domain/object"
 	"yatter-backend-go/app/domain/repository"
@@ -53,14 +51,6 @@ func (r *timeline) GetPublic(ctx context.Context, limit int, maxID int64, sinceI
 		return nil, err
 	}
 	defer rows.Close()
-
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, nil
-		}
-
-		return nil, fmt.Errorf("failed to get timeline from db: %w", err)
-	}
 
 	//statusをtimelineに追加
 	for rows.Next() {

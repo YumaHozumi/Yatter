@@ -36,7 +36,7 @@ func (h *handler) GetPublic(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
-	} else if entity == nil {
+	} else if entity.Statuses == nil {
 		http.Error(w, "Statuses not found", http.StatusBadRequest)
 		return
 	}
