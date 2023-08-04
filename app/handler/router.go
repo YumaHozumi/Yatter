@@ -8,13 +8,14 @@ import (
 	"yatter-backend-go/app/handler/accounts"
 	"yatter-backend-go/app/handler/health"
 	"yatter-backend-go/app/handler/statuses"
+	"yatter-backend-go/app/handler/timeline"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 
-func NewRouter(ar repository.Account, sr repository.Status) http.Handler {
+func NewRouter(ar repository.Account, sr repository.Status, tr repository.Timeline) http.Handler {
 	r := chi.NewRouter()
 
 	// A good base middleware stack
@@ -30,9 +31,9 @@ func NewRouter(ar repository.Account, sr repository.Status) http.Handler {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Mount("/v1/accounts", accounts.NewRouter(ar))
-	//statusesには認証済みのアカウントしかアクセスできない
 	r.Mount("/v1/statuses", statuses.NewRouter(sr, ar))
 	r.Mount("/v1/health", health.NewRouter())
+	r.Mount("/v1/timeline", timeline.NewRouter(tr))
 
 	return r
 }
