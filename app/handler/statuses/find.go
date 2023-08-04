@@ -36,15 +36,11 @@ func (h *handler) Find(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var res Response
-	res.Id = entity.ID
-	res.Account = *account
-	res.Content = entity.Content
-	res.Created_at = entity.CreateAt
+	entity.Account = *account
 
 	//取得したentity返す
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(res); err != nil {
+	if err := json.NewEncoder(w).Encode(entity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
